@@ -52,9 +52,11 @@ app.use("/api/v1/admin", adminRoutes);
 app.get("/health", (req, res) => {
   res.json({ success: true, status: "OK", timestamp: new Date().toISOString() });
 });
-
-app.use((req, res) => {
-  res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "Backend API is running successfully"
+  });
 });
 
 app.use(errorHandler);
