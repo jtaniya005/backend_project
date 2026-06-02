@@ -19,10 +19,11 @@ connectDB();
 
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  origin: [
+    "http://localhost:3000",
+    "https://backend-project-1-k7mm.onrender.com"
+  ],
   credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
 const limiter = rateLimit({
