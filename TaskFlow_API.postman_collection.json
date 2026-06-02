@@ -1,0 +1,182 @@
+{
+  "info": {
+    "name": "TaskFlow API v1",
+    "description": "Complete Postman collection for TaskFlow REST API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "BASE_URL", "value": "http://localhost:5000/api/v1" },
+    { "key": "ACCESS_TOKEN", "value": "" },
+    { "key": "REFRESH_TOKEN", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{BASE_URL}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"John Doe\",\"email\":\"john@example.com\",\"password\":\"Password123\"}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "if (pm.response.code === 201) {",
+              "  const r = pm.response.json();",
+              "  pm.collectionVariables.set('ACCESS_TOKEN', r.accessToken);",
+              "  pm.collectionVariables.set('REFRESH_TOKEN', r.refreshToken);",
+              "}"
+            ]}
+          }]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{BASE_URL}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"email\":\"john@example.com\",\"password\":\"Password123\"}" }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const r = pm.response.json();",
+              "pm.collectionVariables.set('ACCESS_TOKEN', r.accessToken);",
+              "pm.collectionVariables.set('REFRESH_TOKEN', r.refreshToken);"
+            ]}
+          }]
+        },
+        {
+          "name": "Get Me",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/auth/me",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "url": "{{BASE_URL}}/auth/refresh",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"refreshToken\":\"{{REFRESH_TOKEN}}\"}" }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{BASE_URL}}/auth/logout",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Get All Tasks",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{BASE_URL}}/tasks?page=1&limit=10", "query": [
+              { "key": "page", "value": "1" },
+              { "key": "limit", "value": "10" },
+              { "key": "status", "value": "pending", "disabled": true },
+              { "key": "priority", "value": "high", "disabled": true }
+            ]},
+            "header": [{ "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "url": "{{BASE_URL}}/tasks",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"title\":\"My first task\",\"description\":\"Task description\",\"status\":\"pending\",\"priority\":\"high\",\"tags\":[\"work\",\"urgent\"]}" }
+          }
+        },
+        {
+          "name": "Get Task by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/tasks/:id",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PUT",
+            "url": "{{BASE_URL}}/tasks/:id",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"status\":\"completed\",\"priority\":\"low\"}" }
+          }
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "url": "{{BASE_URL}}/tasks/:id",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get Stats",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/admin/stats",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/admin/users",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Update User Role",
+          "request": {
+            "method": "PATCH",
+            "url": "{{BASE_URL}}/admin/users/:id/role",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"role\":\"admin\"}" }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "url": "{{BASE_URL}}/admin/users/:id",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }]
+          }
+        }
+      ]
+    }
+  ]
+}
